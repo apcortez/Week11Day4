@@ -1,4 +1,4 @@
---CREATE DATABASE Ecommerce;
+----CREATE DATABASE Ecommerce;
 
 --CREATE TABLE Prodotto(
 --IdProdotto int IDENTITY(1,1) NOT NULL,
@@ -65,18 +65,26 @@ CREATE PROCEDURE InsertCliente
 @Nome nvarchar(50),
 @Cognome nvarchar(50),
 @DataNascita date,
-@Tipo nvarchar(50),
+@TipoIndirizzo nvarchar(50),
 @Via nvarchar(50),
 @NCivico int,
 @Citta nvarchar(50),
 @Cap int,
 @Provincia nvarchar(50),
 @Nazione nvarchar(50),
+@CodiceCarta char(16),
+@TipoCarta nvarchar(50),
+@Scadenza date,
+@Saldo decimal
 AS
 BEGIN
-	BEGIN TRY	
+	BEGIN TRY
+	DECLARE @IdCliente int
 	INSERT INTO Cliente (Nome, Cognome, DataNascita) VALUES (@Nome, @Cognome, @DataNascita);
-	INSERT INTO Indirizzo(Tipo, Via, NCivico, Città, Cap,Provincia, Nazione) VALUES (@Tipo, @Via, @NCivico, @Citta, @Cap, @Provincia, @Nazione);
+	
+	SELECT @IdCliente = IdCliente FROM Cliente WHERE Nome = @Nome  and Cognome = @Cognome
+	INSERT INTO Indirizzo(Tipo, Via, NCivico, Città, Cap,Provincia, Nazione, IdCliente) VALUES (@TipoIndirizzo, @Via, @NCivico, @Citta, @Cap, @Provincia, @Nazione, @IdCliente);
+	INSERT INTO Carta(CodiceCarta, Tipo, Scadenza, Saldo, IdCliente) VALUES (@CodiceCarta, @TipoCarta, @Scadenza, @Saldo, @IdCliente);
 	END TRY
 
 	BEGIN CATCH
@@ -84,5 +92,4 @@ BEGIN
 	END CATCH
 END
 
-EXECUTE;
-
+EXECUTE InsertCliente 'Pippo', 'Neri', '2000-01-10', 'Residenza', 'Via WaltDisney', 1, 'Milano', 20123, 'Milano', 'Italia', '1111111111111111', 'Debito', '2025-02-10', 2000;
